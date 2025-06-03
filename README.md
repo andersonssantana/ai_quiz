@@ -35,7 +35,7 @@ Este projeto é um **Gerador de Quiz Interativo** que utiliza inteligência arti
 - **Vite**: Build tool otimizada para desenvolvimento rápido
 
 ### Inteligência Artificial
-- **Google Gemini AI (Gemini-1.5-Flash)**: Modelo LLM principal para geração de conteúdo
+- **Google Gemini AI (Gemini-2.0-Flash)**: Modelo LLM principal para geração de conteúdo
 - **OpenAI API**: Configuração preparada para alternativas de IA
 - **Prompt Engineering**: Prompts otimizados para geração consistente de quizzes
 
@@ -70,7 +70,7 @@ src/
 
 ### Google Gemini AI
 
-A aplicação utiliza o modelo **Gemini-1.5-Flash** para geração de conteúdo:
+A aplicação utiliza o modelo **Gemini-2.0-Flash** para geração de conteúdo:
 
 ```javascript
 const prompt = `Gere 5 perguntas de múltipla escolha sobre ${subject}. 
@@ -177,7 +177,7 @@ Produza um JSON válido no seguinte formato EXATO:
 
 ### Por que Google Gemini AI?
 
-- **Performance**: Modelo Gemini-1.5-Flash oferece resposta rápida
+- **Performance**: Modelo Gemini-2.0-Flash oferece resposta rápida
 - **Qualidade**: Geração consistente de conteúdo educativo
 - **Custo-benefício**: API gratuita com limites generosos
 - **Confiabilidade**: Infraestrutura robusta do Google
