@@ -24,10 +24,10 @@ function App() {
     return `Gere ${QUESTIONS_COUNT} perguntas de múltipla escolha sobre ${topic}. Produza um JSON válido no seguinte formato EXATO (array de objetos):
     [
       { "question": "Texto da pergunta 1", "options": ["Opção A", "Opção B", "Opção C", "Opção D"], "correct": "Opção C" },
-      { "question": "Texto da pergunta 2", "options": ["Alt 1", "Alt 2", "Alt 3"], "correct": "Alt 1" },
+      { "question": "Texto da pergunta 2", "options": ["Alt 1", "Alt 2", "Alt 3", "Alt 4"], "correct": "Alt 1" },
       ...
     ]
-    Certifique-se que a resposta em 'correct' seja exatamente igual a uma das strings em 'options'. Retorne APENAS o array JSON, sem nenhum texto adicional, markdown ou formatação como 
+    IMPORTANTE: Cada pergunta deve ter EXATAMENTE 4 alternativas no array 'options'. Certifique-se que a resposta em 'correct' seja exatamente igual a uma das strings em 'options'. Retorne APENAS o array JSON, sem nenhum texto adicional, markdown ou formatação como 
     \`\`\`json ... \`\`\`.`;
   }, []);
 
@@ -36,7 +36,7 @@ function App() {
            questions.every(q => 
              q.question && 
              Array.isArray(q.options) && 
-             q.options.length > 0 &&
+             q.options.length === 4 &&
              q.correct &&
              q.options.includes(q.correct)
            );
