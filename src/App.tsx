@@ -1,9 +1,10 @@
-import { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import QuizQuestion from './QuizQuestion';
+import { QuizQuestion as QuizQuestionType } from './types/quiz';
 import './App.css';
 
-const API_KEY = import.meta.env.VITE_GOOGLE_GEMINI_API_KEY;
+const API_KEY = import.meta.env.VITE_GOOGLE_GEMINI_API_KEY as string;
 const MODEL_NAME = 'gemini-2.0-flash';
 const QUESTIONS_COUNT = 5;
 
@@ -11,16 +12,16 @@ if (!API_KEY) {
   console.error('Chave da API do Google Gemini não encontrada. Verifique o arquivo .env e a variável VITE_GOOGLE_GEMINI_API_KEY.');
 }
 
-function App() {
-  const [subject, setSubject] = useState('');
-  const [questions, setQuestions] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+function App(): React.JSX.Element {
+  const [subject, setSubject] = useState<string>('');
+  const [questions, setQuestions] = useState<QuizQuestionType[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const genAI = useMemo(() => new GoogleGenerativeAI(API_KEY), []);
   const model = useMemo(() => genAI.getGenerativeModel({ model: MODEL_NAME }), [genAI]);
 
-  const createPrompt = useCallback((topic) => {
+  const createPrompt = useCallback((topic: string): string => {
     return `Gere ${QUESTIONS_COUNT} perguntas de múltipla escolha sobre ${topic}. Produza um JSON válido no seguinte formato EXATO (array de objetos):
     [
       { "question": "Texto da pergunta 1", "options": ["Opção A", "Opção B", "Opção C", "Opção D"], "correct": "Opção C" },
@@ -31,18 +32,24 @@ function App() {
     \`\`\`json ... \`\`\`.`;
   }, []);
 
-  const validateQuestions = useCallback((questions) => {
+  const validateQuestions = useCallback((questions: unknown[]): questions is QuizQuestionType[] => {
     return Array.isArray(questions) && 
-           questions.every(q => 
-             q.question && 
-             Array.isArray(q.options) && 
-             q.options.length === 4 &&
-             q.correct &&
-             q.options.includes(q.correct)
+           questions.every((q: unknown): q is QuizQuestionType => 
+             typeof q === 'object' && 
+             q !== null &&
+             'question' in q &&
+             'options' in q &&
+             'correct' in q &&
+             typeof (q as Record<string, unknown>).question === 'string' && 
+             Array.isArray((q as Record<string, unknown>).options) && 
+             (q as Record<string, unknown[]>).options.length === 4 &&
+             (q as Record<string, unknown[]>).options.every((option: unknown) => typeof option === 'string') &&
+             typeof (q as Record<string, unknown>).correct === 'string' &&
+             (q as Record<string, string[]>).options.includes((q as Record<string, string>).correct)
            );
   }, []);
 
-  const parseApiResponse = useCallback((responseText) => {
+  const parseApiResponse = useCallback((responseText: string): QuizQuestionType[] => {
     const cleanedText = responseText.replace(/```json|```|\n`$/g, '').trim();
     const parsedQuestions = JSON.parse(cleanedText);
     
@@ -53,7 +60,7 @@ function App() {
     return parsedQuestions;
   }, [validateQuestions]);
 
-  const generateContent = useCallback(async () => {
+  const generateContent = useCallback(async (): Promise<void> => {
     const trimmedSubject = subject.trim();
     
     if (!trimmedSubject) {
@@ -79,19 +86,25 @@ function App() {
       setQuestions(parsedQuestions);
     } catch (err) {
       console.error('Erro ao gerar conteúdo:', err);
-      const errorMessage = err.message.includes('JSON') 
+      const errorMessage = err instanceof Error && err.message.includes('JSON') 
         ? 'A resposta da API não estava no formato JSON esperado.'
-        : err.message;
+        : err instanceof Error ? err.message : 'Erro desconhecido';
       setError(`Ocorreu um erro ao buscar as perguntas: ${errorMessage}. Tente novamente.`);
     } finally {
       setIsLoading(false);
     }
   }, [subject, model, createPrompt, parseApiResponse]);
 
-  const handleSubjectChange = useCallback((e) => {
+  const handleSubjectChange = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
     setSubject(e.target.value);
     if (error) setError(null);
   }, [error]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (e.key === 'Enter' && !isLoading) {
+      generateContent();
+    }
+  }, [isLoading, generateContent]);
 
   return (
     <div className="app-container">
@@ -104,7 +117,7 @@ function App() {
             onChange={handleSubjectChange}
             placeholder="Digite o tema do quiz"
             disabled={isLoading}
-            onKeyDown={(e) => e.key === 'Enter' && !isLoading && generateContent()}
+            onKeyDown={handleKeyDown}
           />
           <button onClick={generateContent} disabled={isLoading}>
             {isLoading ? 'Gerando...' : 'Gerar Quiz'}

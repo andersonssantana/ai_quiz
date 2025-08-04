@@ -1,14 +1,14 @@
 # AI Quiz Generator - Aplicação Interativa
 
 ![React](https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![Google AI](https://img.shields.io/badge/Google_AI-4285F4?style=for-the-badge&logo=google&logoColor=white)
-![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)
+![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)
 
 ## 📋 Visão Geral
 
-Este projeto é um **Gerador de Quiz Interativo** que utiliza inteligência artificial para criar perguntas de múltipla escolha sobre qualquer tema escolhido pelo usuário. A aplicação demonstra a integração eficiente entre React moderno e APIs de LLM (Large Language Models), oferecendo uma experiência educativa e interativa.
+Este projeto é um **Gerador de Quiz Interativo** desenvolvido com **TypeScript** que utiliza inteligência artificial para criar perguntas de múltipla escolha sobre qualquer tema escolhido pelo usuário. A aplicação demonstra a integração eficiente entre React 19, TypeScript e APIs de LLM (Large Language Models), oferecendo uma experiência educativa, type-safe e interativa.
 
 ### 🎨 Preview da Aplicação
 
@@ -18,21 +18,22 @@ Este projeto é um **Gerador de Quiz Interativo** que utiliza inteligência arti
 
 ## 🚀 Funcionalidades
 
-- **Geração Inteligente de Conteúdo**: Criação automática de 5 perguntas de múltipla escolha sobre qualquer tema usando Google Gemini AI
+- **Geração Inteligente de Conteúdo**: Criação automática de 5 perguntas com exatamente 4 alternativas usando Google Gemini AI
+- **Type Safety**: Tipagem completa com TypeScript garantindo robustez e manutenibilidade
 - **Interface Interativa**: Sistema de quiz com feedback visual imediato após cada resposta
-- **Validação de Respostas**: Destaque automático das respostas corretas e incorretas
-- **Tratamento de Erros**: Sistema de validação de dados e tratamento de exceções
+- **Validação Type-Safe**: Type guards para validação rigorosa dos dados da API
+- **Tratamento de Erros**: Sistema robusto de validação e tratamento de exceções com tipos
 - **Experiência Responsiva**: Interface adaptável para diferentes tamanhos de tela
 - **Estados de Loading**: Feedback visual durante a geração de conteúdo
-- **Parsing Inteligente**: Processamento das respostas da API com limpeza automática de formatação
+- **Parsing Inteligente**: Processamento type-safe das respostas da API com limpeza automática
 - **Prevenção de Interação**: Bloqueio de respostas após seleção para manter integridade do quiz
 
 ## 💻 Tecnologias e Ferramentas
 
 ### Front-end
-- **React 19**: Utilização da versão mais recente com hooks modernos
-- **JavaScript ES6+**: Desenvolvimento com recursos avançados da linguagem
-- **Vite**: Build tool otimizada para desenvolvimento rápido
+- **React 19**: Utilização da versão mais recente com hooks modernos e tipagem completa
+- **TypeScript**: Desenvolvimento type-safe com strict mode habilitado
+- **Vite**: Build tool otimizada para desenvolvimento rápido com suporte completo ao TypeScript
 
 ### Inteligência Artificial
 - **Google Gemini AI (Gemini-2.0-Flash)**: Modelo LLM principal para geração de conteúdo
@@ -40,10 +41,11 @@ Este projeto é um **Gerador de Quiz Interativo** que utiliza inteligência arti
 - **Prompt Engineering**: Prompts otimizados para geração consistente de quizzes
 
 ### Otimizações e Padrões
-- **Error Boundaries**: Tratamento elegante de erros de componentes
-- **State Management**: Gerenciamento eficiente de estado com React Hooks
-- **Performance**: Otimizações para renderização e manipulação de dados
-- **Code Splitting**: Estrutura modular para melhor manutenibilidade
+- **Type Guards**: Validação type-safe com funções de guarda de tipo personalizadas
+- **Interface Design**: Definições de tipos centralizadas para máxima reutilização
+- **State Management**: Gerenciamento type-safe de estado com React Hooks tipados
+- **Performance**: Otimizações para renderização com tipagem que previne erros em runtime
+- **Code Quality**: ESLint + TypeScript com regras rigorosas de qualidade de código
 
 ## 🧠 Arquitetura e Estrutura
 
@@ -51,20 +53,23 @@ Este projeto é um **Gerador de Quiz Interativo** que utiliza inteligência arti
 
 ```bash
 src/
-├── App.jsx                   # Componente principal da aplicação
-├── QuizQuestion.jsx          # Componente individual de pergunta
+├── App.tsx                   # Componente principal da aplicação (TypeScript)
+├── QuizQuestion.tsx          # Componente individual de pergunta (TypeScript)
+├── main.tsx                  # Ponto de entrada da aplicação (TypeScript)
+├── types/
+│   └── quiz.ts              # Definições de tipos TypeScript centralizadas
+├── vite-env.d.ts            # Tipagem das variáveis de ambiente
 ├── App.css                   # Estilos específicos da aplicação
-├── index.css                 # Estilos globais e variáveis CSS
-└── main.jsx                  # Ponto de entrada da aplicação
+└── index.css                 # Estilos globais e variáveis CSS
 ```
 
-### Fluxo de Dados
+### Fluxo de Dados Type-Safe
 
-1. **Input do Usuário**: Tema inserido no campo de texto
-2. **Processamento IA**: Envio do prompt para Google Gemini AI
-3. **Validação**: Parsing e validação do JSON retornado
-4. **Renderização**: Exibição das perguntas de forma interativa
-5. **Interação**: Sistema de resposta com feedback visual
+1. **Input do Usuário**: Tema inserido no campo de texto (validado com TypeScript)
+2. **Processamento IA**: Envio do prompt tipado para Google Gemini AI
+3. **Validação Type-Safe**: Parsing com type guards garantindo estrutura correta
+4. **Renderização**: Exibição das perguntas com componentes totalmente tipados
+5. **Interação**: Sistema de resposta com feedback visual e types seguros
 
 ## 🤖 Integração com IA
 
@@ -72,24 +77,28 @@ src/
 
 A aplicação utiliza o modelo **Gemini-2.0-Flash** para geração de conteúdo:
 
-```javascript
-const prompt = `Gere 5 perguntas de múltipla escolha sobre ${subject}. 
-Produza um JSON válido no seguinte formato EXATO:
-[
-  { 
-    "question": "Texto da pergunta", 
-    "options": ["Opção A", "Opção B", "Opção C", "Opção D"], 
-    "correct": "Opção A" 
-  }
-]`;
+```typescript
+const createPrompt = useCallback((topic: string): string => {
+  return `Gere 5 perguntas de múltipla escolha sobre ${topic}. 
+  Produza um JSON válido no seguinte formato EXATO:
+  [
+    { 
+      "question": "Texto da pergunta", 
+      "options": ["Opção A", "Opção B", "Opção C", "Opção D"], 
+      "correct": "Opção A" 
+    }
+  ]
+  IMPORTANTE: Cada pergunta deve ter EXATAMENTE 4 alternativas no array 'options'.`;
+}, []);
 ```
 
-### Características da Implementação
+### Características da Implementação Type-Safe
 
-- **Prompt Engineering**: Prompts estruturados para resultados consistentes
-- **Parsing**: Sistema de limpeza e validação de JSON
-- **Fallback de Erro**: Tratamento gracioso de falhas na API
-- **Rate Limiting**: Prevenção de múltiplas requisições simultâneas
+- **Prompt Engineering**: Prompts estruturados com tipagem para resultados consistentes
+- **Type Guards**: Validação rigorosa com `questions is QuizQuestionType[]`
+- **Parsing Type-Safe**: Sistema de limpeza e validação de JSON com tipos garantidos
+- **Fallback de Erro**: Tratamento gracioso de falhas na API com tipos de erro específicos
+- **Rate Limiting**: Prevenção de múltiplas requisições com estados tipados
 
 ## 🎯 Funcionalidades Detalhadas
 
@@ -100,12 +109,13 @@ Produza um JSON válido no seguinte formato EXATO:
 - **Estado Bloqueado**: Prevenção de mudança após resposta selecionada
 - **Destaque Visual**: Realce automático da resposta correta quando usuário erra
 
-### Validação e Segurança
+### Validação e Segurança Type-Safe
 
-- **Validação de Input**: Verificação de campos obrigatórios
-- **Sanitização de Dados**: Limpeza de respostas da API
-- **Validação de Estrutura**: Confirmação de formato JSON correto
-- **Tratamento de Exceções**: Captura e apresentação amigável de erros
+- **Validação de Input**: Verificação de campos obrigatórios com tipagem
+- **Type Guards**: Funções de validação que garantem tipos em runtime
+- **Sanitização de Dados**: Limpeza type-safe de respostas da API
+- **Validação de Estrutura**: Confirmação rigorosa com interfaces TypeScript
+- **Tratamento de Exceções**: Captura tipada e apresentação amigável de erros
 
 ## 📱 Design Responsivo
 
@@ -169,8 +179,9 @@ Produza um JSON válido no seguinte formato EXATO:
 ## 🧪 Scripts Disponíveis
 
 - `npm run dev` - Inicia servidor de desenvolvimento com hot-reload
-- `npm run build` - Gera build otimizada para produção
-- `npm run lint` - Executa verificação de código com ESLint
+- `npm run build` - Compila TypeScript e gera build otimizada para produção
+- `npm run typecheck` - Executa verificação de tipos TypeScript sem emitir arquivos
+- `npm run lint` - Executa verificação de código com ESLint + TypeScript
 - `npm run preview` - Serve a build de produção localmente
 
 ## 🔍 Decisões Técnicas
@@ -182,11 +193,13 @@ Produza um JSON válido no seguinte formato EXATO:
 - **Custo-benefício**: API gratuita com limites generosos
 - **Confiabilidade**: Infraestrutura robusta do Google
 
-### Por que React 19?
+### Por que React 19 + TypeScript?
 
-- **Hooks Modernos**: Aproveitamento dos recursos mais recentes
-- **Performance**: Melhorias significativas de renderização
-- **Developer Experience**: Ferramentas de desenvolvimento aprimoradas
+- **Hooks Modernos**: Aproveitamento dos recursos mais recentes com tipagem completa
+- **Type Safety**: Detecção de erros em tempo de compilação
+- **Performance**: Melhorias significativas de renderização com tipos otimizados
+- **Developer Experience**: IntelliSense, refactoring seguro e documentação automática
+- **Manutenibilidade**: Código mais robusto e fácil de manter a longo prazo
 
 ### Por que Vite?
 
@@ -198,29 +211,34 @@ Produza um JSON válido no seguinte formato EXATO:
 
 ### Habilidades Demonstradas
 
-- **Integração com APIs de IA**: Implementação eficiente de LLMs
-- **Processamento de Dados**: Parsing e validação de JSON complexo
-- **Estado Complexo**: Gerenciamento de múltiplos estados da aplicação
-- **Error Handling**: Tratamento robusto de exceções
-- **UX/UI Design**: Interface intuitiva e responsiva
-- **React Moderno**: Uso de hooks e padrões atuais
+- **TypeScript Avançado**: Type guards, interfaces complexas e tipagem rigorosa
+- **Integração com APIs de IA**: Implementação type-safe de LLMs
+- **Processamento de Dados**: Parsing e validação type-safe de JSON complexo
+- **Estado Complexo**: Gerenciamento tipado de múltiplos estados da aplicação
+- **Error Handling**: Tratamento robusto de exceções com tipos específicos
+- **UX/UI Design**: Interface intuitiva, responsiva e type-safe
+- **React Moderno**: Uso de hooks tipados e padrões atuais do mercado
 
 ### Challenges Superados
 
-- **Inconsistência de API**: Tratamento de variações no formato de resposta
-- **Rate Limiting**: Implementação de controles de requisição
-- **Parsing Robusto**: Limpeza automática de markdown e formatação
-- **Estado de Loading**: Feedback visual durante operações assíncronas
+- **Migração para TypeScript**: Refatoração completa mantendo funcionalidade
+- **Type Safety em Runtime**: Implementação de type guards para validação de API
+- **Inconsistência de API**: Tratamento type-safe de variações no formato de resposta
+- **Configuração TypeScript**: Setup otimizado para React 19 + Vite + ESLint
+- **Parsing Robusto**: Limpeza automática type-safe de markdown e formatação
+- **Estado de Loading**: Feedback visual tipado durante operações assíncronas
 
 ## 📝 Sobre o Desenvolvedor
 
 Esta aplicação foi desenvolvida para demonstrar competências em:
 
-- **Frontend Moderno**: React 19, JavaScript ES6+, CSS moderno
-- **Integração de IA**: APIs de LLM, prompt engineering
-- **UX/UI Design**: Interfaces responsivas e acessíveis
-- **Arquitetura**: Código limpo, modular e manutenível
-- **Problem Solving**: Soluções criativas para desafios técnicos
+- **Frontend Moderno**: React 19, TypeScript, CSS moderno
+- **Type Safety**: Desenvolvimento rigoroso com TypeScript e type guards
+- **Integração de IA**: APIs de LLM com tipagem e prompt engineering
+- **Qualidade de Código**: ESLint, configurações rigorosas e best practices
+- **UX/UI Design**: Interfaces responsivas, acessíveis e type-safe
+- **Arquitetura**: Código limpo, modular, tipado e altamente manutenível
+- **Problem Solving**: Soluções criativas e type-safe para desafios técnicos
 
 ---
 
@@ -232,4 +250,4 @@ Esta aplicação foi desenvolvida para demonstrar competências em:
 
 ---
 
-Desenvolvido com 🤖, ⚛️ e 💡 - Demonstrando a fusão entre React moderno e Inteligência Artificial
+Desenvolvido com 🤖, ⚛️, 🔷 e 💡 - Demonstrando a fusão entre React 19, TypeScript e Inteligência Artificial
