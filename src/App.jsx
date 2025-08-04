@@ -1,16 +1,15 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import QuizQuestion from './QuizQuestion';
 import './App.css';
 
-const GOOGLE_GEMINI_API_KEY = import.meta.env.VITE_GOOGLE_GEMINI_API_KEY;
+const API_KEY = import.meta.env.VITE_GOOGLE_GEMINI_API_KEY;
+const MODEL_NAME = 'gemini-2.0-flash';
+const QUESTIONS_COUNT = 5;
 
-if (!GOOGLE_GEMINI_API_KEY) {
-  console.error("Chave da API do Google Gemini não encontrada. Verifique o arquivo .env e a variável VITE_GOOGLE_GEMINI_API_KEY.");
+if (!API_KEY) {
+  console.error('Chave da API do Google Gemini não encontrada. Verifique o arquivo .env e a variável VITE_GOOGLE_GEMINI_API_KEY.');
 }
-
-const genAI = new GoogleGenerativeAI(GOOGLE_GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 function App() {
   const [subject, setSubject] = useState('');
@@ -18,58 +17,81 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const generateContent = async () => {
-    if (!subject.trim()) {
-      setError("Por favor, digite um tema para o quiz.");
-      return;
-    }
-    if (!GOOGLE_GEMINI_API_KEY) {
-        setError("Erro de configuração: Chave da API não encontrada.");
-        return;
-    }
+  const genAI = useMemo(() => new GoogleGenerativeAI(API_KEY), []);
+  const model = useMemo(() => genAI.getGenerativeModel({ model: MODEL_NAME }), [genAI]);
 
-    setIsLoading(true);
-    setError(null);
-    setQuestions([]);
-
-    const prompt = `Gere 5 perguntas de múltipla escolha sobre ${subject}. Produza um JSON válido no seguinte formato EXATO (array de objetos):
+  const createPrompt = useCallback((topic) => {
+    return `Gere ${QUESTIONS_COUNT} perguntas de múltipla escolha sobre ${topic}. Produza um JSON válido no seguinte formato EXATO (array de objetos):
     [
       { "question": "Texto da pergunta 1", "options": ["Opção A", "Opção B", "Opção C", "Opção D"], "correct": "Opção C" },
       { "question": "Texto da pergunta 2", "options": ["Alt 1", "Alt 2", "Alt 3"], "correct": "Alt 1" },
       ...
     ]
     Certifique-se que a resposta em 'correct' seja exatamente igual a uma das strings em 'options'. Retorne APENAS o array JSON, sem nenhum texto adicional, markdown ou formatação como 
-    \`\`\`json ... \`\`\`.
-    `;
+    \`\`\`json ... \`\`\`.`;
+  }, []);
+
+  const validateQuestions = useCallback((questions) => {
+    return Array.isArray(questions) && 
+           questions.every(q => 
+             q.question && 
+             Array.isArray(q.options) && 
+             q.options.length > 0 &&
+             q.correct &&
+             q.options.includes(q.correct)
+           );
+  }, []);
+
+  const parseApiResponse = useCallback((responseText) => {
+    const cleanedText = responseText.replace(/```json|```|\n`$/g, '').trim();
+    const parsedQuestions = JSON.parse(cleanedText);
+    
+    if (!validateQuestions(parsedQuestions)) {
+      throw new Error('Formato JSON recebido da API é inválido.');
+    }
+    
+    return parsedQuestions;
+  }, [validateQuestions]);
+
+  const generateContent = useCallback(async () => {
+    const trimmedSubject = subject.trim();
+    
+    if (!trimmedSubject) {
+      setError('Por favor, digite um tema para o quiz.');
+      return;
+    }
+    
+    if (!API_KEY) {
+      setError('Erro de configuração: Chave da API não encontrada.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    setQuestions([]);
 
     try {
+      const prompt = createPrompt(trimmedSubject);
       const result = await model.generateContent(prompt);
       const responseText = result.response.text();
-
-      let parsedQuestions;
-      try {
-
-        const cleanedText = responseText.replace(/```json|```|\n`$/g, '').trim();
-        parsedQuestions = JSON.parse(cleanedText);
-
-        if (!Array.isArray(parsedQuestions) || parsedQuestions.some(q => !q.question || !Array.isArray(q.options) || !q.correct)) {
-            throw new Error("Formato JSON recebido da API é inválido.");
-        }
-
-      } catch (parseError) {
-        console.error("Erro ao parsear JSON:", parseError);
-        console.error("Texto recebido da API:", responseText);
-        throw new Error("A resposta da API não estava no formato JSON esperado.");
-      }
-
+      const parsedQuestions = parseApiResponse(responseText);
+      
       setQuestions(parsedQuestions);
     } catch (err) {
-      console.error("Erro ao gerar conteúdo:", err);
-      setError(`Ocorreu um erro ao buscar as perguntas: ${err.message}. Tente novamente.`);
+      console.error('Erro ao gerar conteúdo:', err);
+      const errorMessage = err.message.includes('JSON') 
+        ? 'A resposta da API não estava no formato JSON esperado.'
+        : err.message;
+      setError(`Ocorreu um erro ao buscar as perguntas: ${errorMessage}. Tente novamente.`);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [subject, model, createPrompt, parseApiResponse]);
+
+  const handleSubjectChange = useCallback((e) => {
+    setSubject(e.target.value);
+    if (error) setError(null);
+  }, [error]);
 
   return (
     <div className="app-container">
@@ -79,9 +101,10 @@ function App() {
           <input
             type="text"
             value={subject}
-            onChange={(e) => setSubject(e.target.value)}
+            onChange={handleSubjectChange}
             placeholder="Digite o tema do quiz"
             disabled={isLoading}
+            onKeyDown={(e) => e.key === 'Enter' && !isLoading && generateContent()}
           />
           <button onClick={generateContent} disabled={isLoading}>
             {isLoading ? 'Gerando...' : 'Gerar Quiz'}
@@ -96,7 +119,11 @@ function App() {
           <div className="quiz-container">
             <h2>Quiz sobre: {subject}</h2>
             {questions.map((q, index) => (
-              <QuizQuestion key={index} questionData={q} />
+              <QuizQuestion 
+                key={`question-${index}`} 
+                questionData={q} 
+                questionNumber={index + 1}
+              />
             ))}
           </div>
         )}

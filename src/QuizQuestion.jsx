@@ -1,45 +1,52 @@
-import React, { useState } from 'react';
+import { useState, useCallback } from 'react';
 
-function QuizQuestion({ questionData }) {
+function QuizQuestion({ questionData, questionNumber }) {
   const { question, options, correct } = questionData;
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
 
-  const handleAnswerClick = (option) => {
+  const handleAnswerClick = useCallback((option) => {
     if (!isAnswered) {
       setSelectedAnswer(option);
       setIsAnswered(true);
     }
-  };
+  }, [isAnswered]);
 
-  const getButtonClass = (option) => {
+  const getButtonClass = useCallback((option) => {
     if (!isAnswered) {
-      return 'option-button'; // Estilo padrão antes da resposta
+      return 'option-button';
     }
 
     const isCorrect = option === correct;
     const isSelected = option === selectedAnswer;
-
+    
+    const classes = ['option-button'];
+    
     if (isSelected) {
-      return isCorrect ? 'option-button correct selected' : 'option-button incorrect selected';
+      classes.push(isCorrect ? 'correct' : 'incorrect', 'selected');
     } else if (isCorrect) {
-      // Destaca a correta se o usuário errou
-      return 'option-button correct';
+      classes.push('correct');
+    } else {
+      classes.push('answered');
     }
-
-    return 'option-button answered'; // Estilo para opções não selecionadas após resposta
-  };
+    
+    return classes.join(' ');
+  }, [isAnswered, correct, selectedAnswer]);
 
   return (
     <div className="quiz-question-container">
+      {questionNumber && (
+        <div className="question-number">Questão {questionNumber}</div>
+      )}
       <h3 className="question-text">{question}</h3>
       <div className="options-container">
         {options.map((option, index) => (
           <button
-            key={index}
+            key={`option-${index}`}
             className={getButtonClass(option)}
             onClick={() => handleAnswerClick(option)}
-            disabled={isAnswered} // Desabilita após a resposta
+            disabled={isAnswered}
+            aria-pressed={selectedAnswer === option}
           >
             {option}
           </button>
