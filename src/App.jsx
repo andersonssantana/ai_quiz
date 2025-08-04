@@ -73,30 +73,34 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>Gerador de Quiz Interativo</h1>
-      <div className="input-area">
-        <input
-          type="text"
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-          placeholder="Digite o tema do quiz"
-          disabled={isLoading}
-        />
-        <button onClick={generateContent} disabled={isLoading}>
-          {isLoading ? 'Gerando...' : 'Gerar Quiz'}
-        </button>
+      <div className="header-section">
+        <h1>Gerador de Quiz Interativo</h1>
+        <div className="input-area">
+          <input
+            type="text"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder="Digite o tema do quiz"
+            disabled={isLoading}
+          />
+          <button onClick={generateContent} disabled={isLoading}>
+            {isLoading ? 'Gerando...' : 'Gerar Quiz'}
+          </button>
+        </div>
       </div>
 
-      {error && <p className="error-message">{error}</p>}
+      <div className="content-section">
+        {error && <p className="error-message">{error}</p>}
 
-      {questions.length > 0 && (
-        <div className="quiz-container">
-          <h2>Quiz sobre: {subject}</h2>
-          {questions.map((q, index) => (
-            <QuizQuestion key={index} questionData={q} />
-          ))}
-        </div>
-      )}
+        {questions.length > 0 && (
+          <div className="quiz-container">
+            <h2>Quiz sobre: {subject}</h2>
+            {questions.map((q, index) => (
+              <QuizQuestion key={index} questionData={q} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
